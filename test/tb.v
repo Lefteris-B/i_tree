@@ -22,8 +22,13 @@ module tb ();
   wire [7:0] uio_out;
   wire [7:0] uio_oe;
 
+	//wire i_tree_out;
+	//wire i_tree_in;
+	//assign i_tree_out = {7'b1, uo_out[0]};
+	//assign i_tree_in = {7'b1, ui_in[0]};
+
   // Replace tt_um_example with your module name:
-  tt_um_example user_project (
+  tt_um_i_tree_batzolislefteris uut (
 
       // Include power ports for the Gate Level test:
 `ifdef GL_TEST
@@ -42,3 +47,4 @@ module tb ();
   );
 
 endmodule
+

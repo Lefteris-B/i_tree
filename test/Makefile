@@ -5,7 +5,7 @@
 SIM ?= icarus
 TOPLEVEL_LANG ?= verilog
 SRC_DIR = $(PWD)/../src
-PROJECT_SOURCES = project.v
+PROJECT_SOURCES = tt_um_i_tree_batzolislefteris.v i_tree.v IsolationTreeStateMachine.v InputBuffer.v
 
 ifneq ($(GATES),yes)
 
