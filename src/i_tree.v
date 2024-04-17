@@ -11,7 +11,7 @@ wire data_ready;
 wire data_processed;
 
 // Instantiate the InputBuffer module
-InputBuffer #(.DATA_WIDTH(8)) input_buffer_inst (
+  InputBuffer #(.DATA_WIDTH(8)) input_buffer_inst (
     .clk(clk),
     .reset(reset),
     .sensor_data(sensor_data),

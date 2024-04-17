@@ -21,7 +21,7 @@ module tt_um_i_tree_batzolislefteris(
 	assign uo_out[7:1] = 7'b0000_000;
 	
 
-	i_tree i_tree(
+	i_tree i_tree_inst(
 	    .clk(clk),
 	    .reset(rst_n),
 	    .sensor_data(ui_in[0]),
