@@ -4,44 +4,46 @@ module InputBuffer #(
     input wire clk,
     input wire reset,
     input wire sensor_data,
-    input wire data_processed,
+    input wire data_processed,  // Signal from state machine indicating data has been processed
     output reg [DATA_WIDTH-1:0] data_output,
-    output reg data_ready
+    output reg data_ready,
+    output reg buffer_toggle  // New signal to control buffer swapping
 );
 
-reg [DATA_WIDTH-1:0] shift_register;
-reg [$clog2(DATA_WIDTH)-1:0] bit_count;
+reg [DATA_WIDTH-1:0] buffer_0, buffer_1;
+reg select = 0; // Buffer selector for double buffering
 
 // Always block for handling the shift register and outputting data
 always @(posedge clk or negedge reset) begin
     if (!reset) begin
         // Reset all outputs and internal registers
-        shift_register <= 0;
-        bit_count <= 0;
+        buffer_0 <= 0;
+        buffer_1 <= 0;
+        select <= 0;
         data_output <= 0;
         data_ready <= 0;
+        buffer_toggle <= 0;
     end else begin
-        // Process data only if it has not been processed yet
-        if (data_processed) begin
-            data_ready <= 0;  // Acknowledge the data processing
+        if (data_processed && data_ready) begin
+            data_ready <= 0;  // Clear data ready after processing
+            select <= ~select; // Toggle buffer selection
+            buffer_toggle <= ~buffer_toggle; // Toggle buffer control signal
         end
 
-        // Check if new data can be accepted
-        if (!data_ready && bit_count < DATA_WIDTH) begin
-            // Shift in the new bit from the sensor_data input
-            shift_register <= (shift_register << 1) | sensor_data;
-            bit_count <= bit_count + 1;
+        if (!data_ready) begin
+            // Collect data in the inactive buffer to not overwrite data being processed
+            if (select) begin
+                buffer_1 <= (buffer_1 << 1) | sensor_data;
+            end else begin
+                buffer_0 <= (buffer_0 << 1) | sensor_data;
+            end
 
-            // Check if we have received enough bits
-            if (bit_count == DATA_WIDTH - 1) begin
-                data_output <= shift_register;  // Move complete data to output
-                data_ready <= 1;  // Indicate that data is ready
-                bit_count <= 0;  // Reset bit count for next data
-                shift_register <= 0;  // Reset shift register for next data
+            if (buffer_0 == (DATA_WIDTH - 1) || buffer_1 == (DATA_WIDTH - 1)) begin
+                data_output <= select ? buffer_1 : buffer_0;
+                data_ready <= 1;
             end
         end
     end
 end
 
 endmodule
-
