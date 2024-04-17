@@ -9,7 +9,6 @@ module i_tree(
 wire [7:0] data_from_buffer;
 wire data_ready;
 wire data_processed;
-wire buffer_toggle; // Added to handle the buffer toggle between InputBuffer and IsolationTreeStateMachine
 
 // Instantiate the InputBuffer module
 InputBuffer #(.DATA_WIDTH(8)) input_buffer_inst (
@@ -18,8 +17,7 @@ InputBuffer #(.DATA_WIDTH(8)) input_buffer_inst (
     .sensor_data(sensor_data),
     .data_processed(data_processed),
     .data_output(data_from_buffer),
-    .data_ready(data_ready),
-    .buffer_toggle(buffer_toggle) // Connect the new buffer_toggle signal
+    .data_ready(data_ready)
 );
 
 // Instantiate the IsolationTreeStateMachine module
@@ -29,8 +27,7 @@ IsolationTreeStateMachine isolation_tree_state_machine_inst (
     .data_input(data_from_buffer),
     .data_valid(data_ready),
     .anomaly_detected(anomaly_detected),
-    .data_processed(data_processed),
-    .buffer_toggle(buffer_toggle) // Receive the buffer_toggle signal
+    .data_processed(data_processed)
 );
 
 endmodule

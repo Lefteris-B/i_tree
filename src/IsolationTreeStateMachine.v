@@ -4,8 +4,7 @@ module IsolationTreeStateMachine(
     input wire [7:0] data_input,
     input wire data_valid,
     output reg anomaly_detected,
-    output reg data_processed,
-    input wire buffer_toggle  // New signal indicating buffer toggle from InputBuffer
+    output reg data_processed
 );
 
 // Define state constants
@@ -16,7 +15,6 @@ localparam [1:0] IDLE = 2'b00,
 // State variables
 reg [1:0] current_state = IDLE;
 reg [1:0] next_state = IDLE;
-reg buffer_toggle_reg = 0; // Register to store buffer toggle state
 
 always @(posedge clk or negedge reset) begin
     if (!reset) begin
@@ -25,18 +23,14 @@ always @(posedge clk or negedge reset) begin
         data_processed <= 0;
         current_state <= IDLE;
         next_state <= IDLE;
-        buffer_toggle_reg <= 0;
     end else begin
-        // Store buffer toggle state
-        buffer_toggle_reg <= buffer_toggle;
-
         current_state <= next_state; // Transition to the next state
 
         case (current_state)
             IDLE: begin
                 anomaly_detected <= 0; // Reset anomaly_detected each cycle
-                if (data_valid && buffer_toggle == buffer_toggle_reg)
-                    next_state <= CHECK_ANOMALY; // Transition only if buffer toggle matches
+                if (data_valid)
+                    next_state <= CHECK_ANOMALY; // Transition to check anomaly if data is valid
             end
             CHECK_ANOMALY: begin
                 // Perform anomaly check
